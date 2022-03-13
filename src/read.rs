@@ -1,16 +1,15 @@
 use once_cell::sync::Lazy;
 use rusqlite::{params, Connection};
 use std::{
-    error::Error,
     io::{BufRead, BufReader, Read, Seek},
     sync::Mutex,
 };
 use zip::ZipArchive;
 
 pub static DB: Lazy<Mutex<Connection>> =
-    Lazy::new(|| Mutex::new(Connection::open_in_memory().unwrap()));
+    Lazy::new(|| Mutex::new(Connection::open("unihan.db").unwrap()));
 
-pub fn init_db(zipfile: impl Read + Seek) -> Result<(), Box<dyn Error>> {
+pub fn init_db(zipfile: impl Read + Seek) -> Result<(), crate::InternalError> {
     let mut zip = ZipArchive::new(zipfile)?;
 
     let mut conn = DB.lock()?;
